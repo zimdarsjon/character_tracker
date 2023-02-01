@@ -1,5 +1,6 @@
 import Link from 'next/link'
 import React from 'react';
+import axios from 'axios';
 
 const { useState } = React;
 
@@ -20,9 +21,15 @@ export default function Signup() {
   const submit = (e) => {
     e.preventDefault();
     if (formFields.password !== formFields.validationPassword) {
-      setError('Passwords do not match')
+      setError('Passwords do not match');
+      return;
     }
-    console.log(formFields);
+    axios.post('/api/user', formFields)
+      .catch(err => {
+        if (err.response.data.message) {
+          setError(err.response.data.message);
+        }
+      })
   }
 
   return (
