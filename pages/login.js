@@ -1,8 +1,13 @@
 import Link from 'next/link';
 import React from 'react';
+import axios from 'axios';
+import { signIn } from 'next-auth/react';
+import { getSession } from "next-auth/react";
+import { useRouter } from "next/router";
 
 const { useState } = React;
 export default function Login() {
+  const router = useRouter();
   const [error, setError] = useState('');
   const [formFields, setFormFields] = useState({
     username: '',
@@ -14,9 +19,19 @@ export default function Login() {
     setFormFields({ ...formFields, [e.target.name]: e.target.value })
   }
 
-  const submit = (e) => {
+  const submit = async (e) => {
     e.preventDefault();
-    console.log(formFields);
+    const res = await signIn('credentials', {
+      ...formFields,
+      redirect: false
+     });
+
+    if (res?.error) {
+      setError(res.error)
+    } else {
+      router.push('/');
+    }
+
   }
 
   return (
@@ -33,4 +48,19 @@ export default function Login() {
       </Link>
     </div>
   )
+}
+
+export async function getServerSideProps(context) {
+  const session = await getSession(context);
+  if (session) {
+    return {
+      redirect: {
+        destination: '/',
+        permanent: false,
+      },
+    }
+  }
+  return {
+    props: { session }
+  }
 }
