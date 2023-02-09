@@ -11,7 +11,9 @@ const { useState, useEffect } = React;
 
 export default function CreateCharacter() {
   const [backgroundData, setBackgroundData] = useState([]);
-  const [playerBackground, setPlayerBackground] = useState(-1);
+  const [characterBackground, setCharacterBackground] = useState(-1);
+  const [classData, setClassData] = useState([]);
+  const [characterClass, setCharacterClass] = useState(-1);
 
   const [page, setPage] = useState(1);
   const [formFields, setFormFields] = useState({
@@ -26,6 +28,9 @@ export default function CreateCharacter() {
     axios.get('/api/backgrounds')
       .then(res => setBackgroundData(res.data))
       .catch((err) => console.log(err))
+    axios.get('/api/classes')
+      .then(res => setClassData(res.data))
+      .catch((err) => console.log(err))
   }, [])
 
   const flipPage = (next) => {
@@ -35,8 +40,8 @@ export default function CreateCharacter() {
   return (
     <div>
       <h1>Character Creator</h1>
-      {page === 1 && <Background backgrounds={backgroundData} playerBackground={playerBackground} setPlayerBackground={setPlayerBackground}/>}
-      {page === 2 && <CharacterClass />}
+      {page === 1 && <Background backgrounds={backgroundData} characterBackground={characterBackground} setCharacterBackground={setCharacterBackground}/>}
+      {page === 2 && <CharacterClass classes={classData} setCharacterClass={setCharacterClass} characterClass={characterClass}/>}
       {page === 3 && <Proficiencies />}
       {page === 4 && <Scores />}
       {page === 5 && <Summary />}
