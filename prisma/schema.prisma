@@ -16,3 +16,15 @@ model User {
   email String @unique
   password String
 }
+
+model Class {
+  id Int @id @default(autoincrement())
+  name String @unique
+  hitdice Int
+}
+
+model Skills {
+  id Int @id @default(autoincrement())
+  name String
+  ability String
+}

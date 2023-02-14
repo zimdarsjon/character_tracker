@@ -6,6 +6,7 @@ import Background from '../components/createCharacter/Background.jsx';
 import Scores from '../components/createCharacter/Scores.jsx';
 import Proficiencies from '../components/createCharacter/Proficiencies.jsx';
 import Summary from '../components/createCharacter/Summary.jsx';
+import { BottomNavigation, Paper, Button } from '@mui/material';
 
 const { useState, useEffect } = React;
 
@@ -14,6 +15,10 @@ export default function CreateCharacter() {
   const [characterBackground, setCharacterBackground] = useState(-1);
   const [classData, setClassData] = useState([]);
   const [characterClass, setCharacterClass] = useState(-1);
+
+  const [backgroundSkills, setBackgroundSkills] = useState([]);
+  const [skillSelections, setSkillSelections] = useState([]);
+  const [skills, setSkills] = useState([]);
 
   const [page, setPage] = useState(1);
   const [formFields, setFormFields] = useState({
@@ -33,6 +38,25 @@ export default function CreateCharacter() {
       .catch((err) => console.log(err))
   }, [])
 
+  // Update Background skills
+  useEffect(() => {
+    if (characterBackground !== -1) {
+      setBackgroundSkills(backgroundData[characterBackground].skills)
+    }
+  }, [characterBackground])
+
+  // Update Total Skills
+  useEffect(() => {
+    let skillList = [];
+    backgroundSkills.forEach(skill => {
+      skillList.push({
+        name: skill,
+        from: backgroundData[characterBackground].name
+      })
+    })
+    setSkills(skillList);
+  }, [backgroundSkills, skillSelections])
+
   const flipPage = (next) => {
     next ? setPage(page + 1) : setPage(page - 1);
   }
@@ -40,13 +64,17 @@ export default function CreateCharacter() {
   return (
     <div>
       <h1>Character Creator</h1>
-      {page === 1 && <Background backgrounds={backgroundData} characterBackground={characterBackground} setCharacterBackground={setCharacterBackground}/>}
-      {page === 2 && <CharacterClass classes={classData} setCharacterClass={setCharacterClass} characterClass={characterClass}/>}
-      {page === 3 && <Proficiencies />}
+      {page === 1 && <Background backgrounds={backgroundData} characterBackground={characterBackground} setCharacterBackground={setCharacterBackground} />}
+      {page === 2 && <CharacterClass classes={classData} setCharacterClass={setCharacterClass} characterClass={characterClass} />}
+      {page === 3 && <Proficiencies skills={skills} characterClass={classData[characterClass]} setSkillSelections={setSkillSelections} />}
       {page === 4 && <Scores />}
       {page === 5 && <Summary />}
-      {page !== 1 && <button onClick={e => flipPage(false)}>Previous</button>}
-      {page !== 5 && <button onClick={e => flipPage(true)}>Next</button>}
+      <Paper sx={{ position: 'fixed', bottom: 0, left: 0, right: 0}} elevation={3}>
+        <BottomNavigation sx={{ display: 'flex', justifyContent: 'space-between' }}>
+          {page !== 1 && <Button onClick={e => flipPage(false)}>Previous</Button>}
+          {page !== 5 && <Button sx={{marginLeft: 'auto'}} onClick={e => flipPage(true)}>Next</Button>}
+        </BottomNavigation>
+      </Paper>
     </div>
   )
 }
